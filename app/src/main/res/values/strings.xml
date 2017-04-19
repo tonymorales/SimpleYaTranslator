@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SimpleYaTranslator</string>
+    <string name="title_home">Переводчик</string>
+    <string name="title_dashboard">История</string>
+    <string name="translate_button_text">Translate</string>
+
+</resources>
