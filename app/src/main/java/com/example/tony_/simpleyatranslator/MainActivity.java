@@ -1,30 +1,37 @@
 package com.example.tony_.simpleyatranslator;
 
+
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.tony_.simpleyatranslator.network.NetworkServiceGenerator;
-import com.example.tony_.simpleyatranslator.network.response.TranslatedText;
+import com.example.tony_.simpleyatranslator.UI.FragmentTranslation;
+import com.example.tony_.simpleyatranslator.UI.FragmentTranslationHistory;
+import com.example.tony_.simpleyatranslator.UI.TranslationFragment;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
-
     private TextView mTextMessage;
-    private TextView mTextViewResult;
-    private EditText mEditextToTranslate;
-    private Button mButtonTranslate;
+    private ViewPager mViewPager;
+    private Toolbar mToolbar;
+    private TabLayout mTabLayout;
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -50,36 +57,56 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTextViewResult = ((TextView) findViewById(R.id.text_result));
-        mEditextToTranslate = ((EditText) findViewById(R.id.text_to_translate));
-
         mTextMessage = (TextView) findViewById(R.id.message);
+
+        mViewPager = (ViewPager) findViewById(R.id.view_pager);
+        setupViewPager(mViewPager);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mTabLayout.setupWithViewPager(mViewPager);
+        //getSupportFragmentManager().beginTransaction().replace(R.id.container, new FragmentTranslation()).commit();
+
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        mButtonTranslate = (Button) findViewById(R.id.button_tarnslate);
-        mButtonTranslate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String translateText = mEditextToTranslate.getText().toString();
+    }
 
-                    NetworkServiceGenerator.getApi().getTranslate(AppConfig.API_KEY, translateText, "ru", "plain").enqueue(new Callback<TranslatedText>() {
-                        @Override
-                        public void onResponse(Call<TranslatedText> call, Response<TranslatedText> response) {
-                            if(response.code()==200){
-                                mTextViewResult.setText(response.body().text.toString());
-                            }
+    private void setupViewPager(ViewPager viewPager){
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        //adapter.addFragment(new FragmentTranslation(), "Переводчик");
+        adapter.addFragment(new TranslationFragment(), "Переводчик");
+        adapter.addFragment(new FragmentTranslationHistory(), "История");
+        viewPager.setAdapter(adapter);
+    }
 
-                        }
 
-                        @Override
-                        public void onFailure(Call<TranslatedText> call, Throwable t) {
 
-                        }
-                    });
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitlesList = new ArrayList<>();
 
-             }
+        public ViewPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
 
-        });
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public  void addFragment(Fragment fragment, String title){
+            mFragmentList.add(fragment);
+            mFragmentTitlesList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitlesList.get(position);
+        }
     }
 }

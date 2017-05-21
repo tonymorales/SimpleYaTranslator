@@ -1,18 +1,23 @@
-package com.example.tony_.simpleyatranslator.network;
+package com.example.tony_.simpleyatranslator;
 
 
 import android.app.Application;
 
-import com.example.tony_.simpleyatranslator.AppConfig;
+import com.example.tony_.simpleyatranslator.network.IRestApi;
+import com.example.tony_.simpleyatranslator.storage.model.DaoMaster;
+import com.example.tony_.simpleyatranslator.storage.model.DaoSession;
+
+import org.greenrobot.greendao.database.Database;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class NetworkServiceGenerator extends Application{
+public class ServiceManager extends Application{
 
     private static IRestApi api;
+    private static DaoSession daoSession;
 
 
 
@@ -20,7 +25,7 @@ public class NetworkServiceGenerator extends Application{
     public void onCreate() {
         super.onCreate();
 
-
+        //Initializing Retrofit session for API interaction
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -33,11 +38,18 @@ public class NetworkServiceGenerator extends Application{
                 .baseUrl(AppConfig.BASE_URL)
                 .client(httpClient.build())
                 .build();
-
+        //Initializing Dao session for Database interaction
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "translations-db");
+        Database db = helper.getWritableDb();
+        daoSession = new DaoMaster(db).newSession();
         api = retrofit.create(IRestApi.class);
     }
 
     public static IRestApi getApi(){
         return api;
+    }
+
+    public static DaoSession getDaoSession(){
+        return daoSession;
     }
 }
