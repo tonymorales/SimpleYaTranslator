@@ -1,13 +1,14 @@
 package com.example.tony_.simpleyatranslator.storage.model;
 
-import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.DaoException;
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Id;
 
 @Entity(active = true, nameInDb = "TRANSLATIONS")
 public class Translation {
 
+    private static final String LOG_TAG = "Translation";
     @Id
     private Long id;
 
@@ -18,6 +19,14 @@ public class Translation {
     private int favorite;
     private String dateTime;
 
+
+    @Override
+    public String toString() {
+
+        return "Translate text: " + textFrom + ". With result: " + textResult
+                + ". Lang: " + langTo + "-" + langFrom + ". Time: " + dateTime;
+    }
+
     /** Used to resolve relations */
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
@@ -27,6 +36,7 @@ public class Translation {
     private transient TranslationDao myDao;
 
     public Translation(String textFrom, String textResult, String langFrom, String langTo, int favorite, String dateTime) {
+      //  Log.d(LOG_TAG, "Building new object");
         this.textFrom = textFrom;
         this.textResult = textResult;
         this.langFrom = langFrom;
@@ -149,4 +159,6 @@ public class Translation {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getTranslationDao() : null;
     }
+
+
 }

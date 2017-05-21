@@ -1,9 +1,8 @@
 package com.example.tony_.simpleyatranslator.UI;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +53,7 @@ public class FragmentTranslation extends Fragment {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_fragment_translation, container, false);
-
+        Log.d("DAO", "Insertion");
         DaoSession daoSession = ServiceManager.getDaoSession();
         mTranslationDao = daoSession.getTranslationDao();
 
@@ -69,19 +68,22 @@ public class FragmentTranslation extends Fragment {
             @Override
             public void onClick(View v) {
                 final String translateText = mEditextToTranslate.getText().toString();
-
+                Log.d("DAO", "Insertion");
                 ServiceManager.getApi().getTranslate(AppConfig.API_KEY, translateText, "ru", "plain").enqueue(new Callback<TranslatedText>() {
                     @Override
                     public void onResponse(Call<TranslatedText> call, Response<TranslatedText> response) {
                         if(response.code()==200){
                             String[] lang = response.body().lang.split("-", 2);
                             String textResult = response.body().text.get(0);
-                            mTextViewResult.setText(textResult);
+
                             String dateTime = new SimpleDateFormat("d MMM yyyy HH:mm:ss").toString();
                             //String dateTime = new SimpleDateFormat("d MMM yyyy HH:mm:ss").toString();
                             Translation translation = new Translation(translateText, textResult, lang[0], lang[1], 0, dateTime);
-                            mTranslationDao.insert(translation);
-
+                            long id = mTranslationDao.insert(translation);
+                            //Log.d(TAG, String.valueOf(id));
+                            Log.d("DAO", "Insertion");
+                            Log.d("DAO", "Translation " + translation.toString());
+                            mTextViewResult.setText(textResult + " " + id + " " +translation.toString() );
 
 
                         }
